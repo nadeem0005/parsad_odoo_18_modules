@@ -20,7 +20,7 @@ Sales: Assigned Warehouse, Payment Status & Salesperson Lock
     - cannot change the Salesperson of an order (always themselves);
     - only see their own orders.
 """,
-    'author': 'Your Company',
+    'author': 'inoviqsystems',
     'license': 'LGPL-3',
     'depends': ['sale_stock', 'account', 'wh_transfer_order'],
     'data': [

@@ -27,7 +27,7 @@ company transit location. Users never have to open the Transfers screen:
 the linked pickings are locked and can only be processed from the order.
 The received quantity always equals the shipped quantity, so nothing is left in transit.
 """,
-    'author': 'Your Company',
+    'author': 'inoviqsystems',
     'license': 'LGPL-3',
     'depends': ['stock', 'mail'],
     'data': [
