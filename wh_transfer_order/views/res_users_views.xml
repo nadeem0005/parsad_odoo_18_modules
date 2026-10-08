@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_users_form_wh_transfer" model="ir.ui.view">
+        <field name="name">res.users.form.wh.transfer</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <!-- Anchor on the notebook, never on groups_id: Odoo replaces that field
+                 with the generated group checkboxes. -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Warehouse Transfers" name="wh_transfer"
+                      groups="base.group_erp_manager">
+                    <group>
+                        <field name="wh_transfer_warehouse_ids" widget="many2many_tags"
+                               options="{'no_create': True}"
+                               placeholder="Select the warehouses this user works with..."/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

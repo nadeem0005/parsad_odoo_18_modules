@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_wh_transfer_order"
+              name="Warehouse Transfers"
+              parent="stock.menu_stock_transfers"
+              action="wh_transfer_order_action"
+              sequence="5"
+              groups="wh_transfer_order.group_wh_transfer_user,wh_transfer_order.group_wh_transfer_shipper,wh_transfer_order.group_wh_transfer_receiver"/>
+</odoo>

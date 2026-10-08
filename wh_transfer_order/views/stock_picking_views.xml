@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_picking_form_wh_transfer" model="ir.ui.view">
+        <field name="name">stock.picking.form.wh.transfer</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='origin']" position="after">
+                <field name="wh_transfer_id" invisible="not wh_transfer_id"/>
+                <field name="wh_transfer_leg" invisible="not wh_transfer_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_picking_internal_search_wh_transfer" model="ir.ui.view">
+        <field name="name">stock.picking.search.wh.transfer</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_internal_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='origin']" position="after">
+                <field name="wh_transfer_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

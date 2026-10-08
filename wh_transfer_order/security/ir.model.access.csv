@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_wh_transfer_order_creator,wh.transfer.order.creator,model_wh_transfer_order,group_wh_transfer_user,1,1,1,0
+access_wh_transfer_order_shipper,wh.transfer.order.shipper,model_wh_transfer_order,group_wh_transfer_shipper,1,1,0,0
+access_wh_transfer_order_receiver,wh.transfer.order.receiver,model_wh_transfer_order,group_wh_transfer_receiver,1,1,0,0
+access_wh_transfer_order_manager,wh.transfer.order.manager,model_wh_transfer_order,group_wh_transfer_manager,1,1,1,1
+access_wh_transfer_order_line_creator,wh.transfer.order.line.creator,model_wh_transfer_order_line,group_wh_transfer_user,1,1,1,1
+access_wh_transfer_order_line_shipper,wh.transfer.order.line.shipper,model_wh_transfer_order_line,group_wh_transfer_shipper,1,1,0,0
+access_wh_transfer_order_line_receiver,wh.transfer.order.line.receiver,model_wh_transfer_order_line,group_wh_transfer_receiver,1,0,0,0
+access_wh_transfer_order_line_manager,wh.transfer.order.line.manager,model_wh_transfer_order_line,group_wh_transfer_manager,1,1,1,1

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Global: multi-company -->
+    <record id="wh_transfer_order_company_rule" model="ir.rule">
+        <field name="name">Warehouse Transfer Order: multi-company</field>
+        <field name="model_id" ref="model_wh_transfer_order"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="wh_transfer_order_line_company_rule" model="ir.rule">
+        <field name="name">Warehouse Transfer Order Line: multi-company</field>
+        <field name="model_id" ref="model_wh_transfer_order_line"/>
+        <field name="domain_force">[('order_id.company_id', 'in', company_ids)]</field>
+    </record>
+
+    <!-- Creator: orders that start from his warehouses -->
+    <record id="wh_transfer_order_creator_rule" model="ir.rule">
+        <field name="name">Warehouse Transfer Order: creator (source warehouses)</field>
+        <field name="model_id" ref="model_wh_transfer_order"/>
+        <field name="groups" eval="[(4, ref('group_wh_transfer_user'))]"/>
+        <field name="domain_force">[('source_warehouse_id', 'in', user.wh_transfer_warehouse_ids.ids)]</field>
+    </record>
+    <record id="wh_transfer_order_line_creator_rule" model="ir.rule">
+        <field name="name">Warehouse Transfer Order Line: creator (source warehouses)</field>
+        <field name="model_id" ref="model_wh_transfer_order_line"/>
+        <field name="groups" eval="[(4, ref('group_wh_transfer_user'))]"/>
+        <field name="domain_force">[('order_id.source_warehouse_id', 'in', user.wh_transfer_warehouse_ids.ids)]</field>
+    </record>
+
+    <!-- Shipper: confirmed orders that start from his warehouses -->
+    <record id="wh_transfer_order_shipper_rule" model="ir.rule">
+        <field name="name">Warehouse Transfer Order: shipper (source warehouses)</field>
+        <field name="model_id" ref="model_wh_transfer_order"/>
+        <field name="groups" eval="[(4, ref('group_wh_transfer_shipper'))]"/>
+        <field name="domain_force">[('source_warehouse_id', 'in', user.wh_transfer_warehouse_ids.ids), ('state', '!=', 'draft')]</field>
+    </record>
+    <record id="wh_transfer_order_line_shipper_rule" model="ir.rule">
+        <field name="name">Warehouse Transfer Order Line: shipper (source warehouses)</field>
+        <field name="model_id" ref="model_wh_transfer_order_line"/>
+        <field name="groups" eval="[(4, ref('group_wh_transfer_shipper'))]"/>
+        <field name="domain_force">[('order_id.source_warehouse_id', 'in', user.wh_transfer_warehouse_ids.ids), ('order_id.state', '!=', 'draft')]</field>
+    </record>
+
+    <!-- Receiver: orders that arrive at his warehouses -->
+    <record id="wh_transfer_order_receiver_rule" model="ir.rule">
+        <field name="name">Warehouse Transfer Order: receiver (destination warehouses)</field>
+        <field name="model_id" ref="model_wh_transfer_order"/>
+        <field name="groups" eval="[(4, ref('group_wh_transfer_receiver'))]"/>
+        <field name="domain_force">[('dest_warehouse_id', 'in', user.wh_transfer_warehouse_ids.ids), ('state', '!=', 'draft')]</field>
+    </record>
+    <record id="wh_transfer_order_line_receiver_rule" model="ir.rule">
+        <field name="name">Warehouse Transfer Order Line: receiver (destination warehouses)</field>
+        <field name="model_id" ref="model_wh_transfer_order_line"/>
+        <field name="groups" eval="[(4, ref('group_wh_transfer_receiver'))]"/>
+        <field name="domain_force">[('order_id.dest_warehouse_id', 'in', user.wh_transfer_warehouse_ids.ids), ('order_id.state', '!=', 'draft')]</field>
+    </record>
+
+    <!-- Managers: every warehouse -->
+    <record id="wh_transfer_order_manager_rule" model="ir.rule">
+        <field name="name">Warehouse Transfer Order: manager sees all</field>
+        <field name="model_id" ref="model_wh_transfer_order"/>
+        <field name="groups" eval="[(4, ref('group_wh_transfer_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+    <record id="wh_transfer_order_line_manager_rule" model="ir.rule">
+        <field name="name">Warehouse Transfer Order Line: manager sees all</field>
+        <field name="model_id" ref="model_wh_transfer_order_line"/>
+        <field name="groups" eval="[(4, ref('group_wh_transfer_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+</odoo>

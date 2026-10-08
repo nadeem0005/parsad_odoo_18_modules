@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="wh_transfer_order_view_form" model="ir.ui.view">
+        <field name="name">wh.transfer.order.form</field>
+        <field name="model">wh.transfer.order</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" invisible="state != 'draft' or not can_confirm"
+                            groups="wh_transfer_order.group_wh_transfer_user"/>
+                    <button name="action_ship" type="object" string="Ship"
+                            class="btn-primary" invisible="state != 'confirmed' or not can_ship"
+                            groups="wh_transfer_order.group_wh_transfer_shipper"
+                            confirm="Ship the quantities entered in the Sent column?"/>
+                    <button name="action_receive" type="object" string="Receive"
+                            class="btn-primary" invisible="state != 'in_transit' or not can_receive"
+                            groups="wh_transfer_order.group_wh_transfer_receiver"
+                            confirm="Receive the full shipped quantities?"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state != 'confirmed' or not can_confirm"
+                            groups="wh_transfer_order.group_wh_transfer_user"
+                            confirm="Cancel this transfer order?"/>
+                    <button name="action_draft" type="object" string="Reset to Draft"
+                            invisible="state != 'cancel'"
+                            groups="wh_transfer_order.group_wh_transfer_manager"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed,in_transit,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_pickings" type="object"
+                                class="oe_stat_button" icon="fa-truck"
+                                invisible="picking_count == 0"
+                                groups="wh_transfer_order.group_wh_transfer_manager">
+                            <field name="picking_count" widget="statinfo" string="Transfers"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group name="source">
+                            <!-- Managers may open the warehouse / location record; others see plain text -->
+                            <field name="source_warehouse_id" readonly="state != 'draft'"
+                                   options="{'no_create': True}"
+                                   groups="wh_transfer_order.group_wh_transfer_manager"/>
+                            <field name="source_warehouse_id" readonly="state != 'draft'"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   groups="!wh_transfer_order.group_wh_transfer_manager"/>
+                            <field name="source_location_id" readonly="state != 'draft'"
+                                   options="{'no_create': True}" invisible="not show_locations"
+                                   groups="wh_transfer_order.group_wh_transfer_manager"/>
+                            <field name="source_location_id" readonly="state != 'draft'"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   invisible="not show_locations"
+                                   groups="!wh_transfer_order.group_wh_transfer_manager"/>
+                        </group>
+                        <group name="destination">
+                            <field name="dest_warehouse_id" readonly="state != 'draft'"
+                                   options="{'no_create': True}"
+                                   groups="wh_transfer_order.group_wh_transfer_manager"/>
+                            <field name="dest_warehouse_id" readonly="state != 'draft'"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   groups="!wh_transfer_order.group_wh_transfer_manager"/>
+                            <field name="dest_location_id" readonly="state != 'draft'"
+                                   options="{'no_create': True}" invisible="not show_locations"
+                                   groups="wh_transfer_order.group_wh_transfer_manager"/>
+                            <field name="dest_location_id" readonly="state != 'draft'"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   invisible="not show_locations"
+                                   groups="!wh_transfer_order.group_wh_transfer_manager"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'draft'" options="{'no_open': True}"/>
+                            <field name="show_locations" invisible="1"/>
+                            <field name="can_confirm" invisible="1"/>
+                            <field name="can_ship" invisible="1"/>
+                            <field name="can_receive" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Products" name="products">
+                            <!-- Draft: build the order -->
+                            <field name="line_ids" invisible="state != 'draft'">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id" options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="product_uom_id" groups="uom.group_uom"/>
+                                    <field name="qty_demand"/>
+                                </list>
+                            </field>
+                            <!-- After confirmation: ship and receive on the same lines -->
+                            <field name="shipment_line_ids" invisible="state == 'draft'">
+                                <list editable="bottom" create="0" delete="0">
+                                    <field name="product_id" readonly="1" options="{'no_open': True}"/>
+                                    <field name="product_uom_id" readonly="1" groups="uom.group_uom"/>
+                                    <field name="qty_demand" readonly="1"/>
+                                    <field name="qty_sent"
+                                           readonly="parent.state != 'confirmed' or not parent.can_ship"/>
+                                    <field name="qty_received" readonly="1"
+                                           column_invisible="parent.state != 'done'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="wh_transfer_order_view_list" model="ir.ui.view">
+        <field name="name">wh.transfer.order.list</field>
+        <field name="model">wh.transfer.order</field>
+        <field name="arch" type="xml">
+            <list decoration-info="state == 'confirmed'" decoration-warning="state == 'in_transit'"
+                  decoration-muted="state == 'cancel'">
+                <field name="name"/>
+                <field name="source_warehouse_id"/>
+                <field name="dest_warehouse_id"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'confirmed'"
+                       decoration-warning="state == 'in_transit'"
+                       decoration-success="state == 'done'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="wh_transfer_order_view_search" model="ir.ui.view">
+        <field name="name">wh.transfer.order.search</field>
+        <field name="model">wh.transfer.order</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="source_warehouse_id"/>
+                <field name="dest_warehouse_id"/>
+                <field name="line_ids" string="Product" filter_domain="[('line_ids.product_id', 'ilike', self)]"/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="in_transit" string="In Transit" domain="[('state', '=', 'in_transit')]"/>
+                <filter name="done" string="Done" domain="[('state', '=', 'done')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_source" string="From Warehouse" context="{'group_by': 'source_warehouse_id'}"/>
+                    <filter name="group_dest" string="To Warehouse" context="{'group_by': 'dest_warehouse_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="wh_transfer_order_action" model="ir.actions.act_window">
+        <field name="name">Warehouse Transfer Orders</field>
+        <field name="res_model">wh.transfer.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first warehouse transfer order</p>
+            <p>Move products between warehouses with a dispatch and a receipt linked through the transit location.</p>
+        </field>
+    </record>
+</odoo>

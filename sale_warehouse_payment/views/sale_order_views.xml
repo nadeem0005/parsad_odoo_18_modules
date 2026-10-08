@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Orders list: Paid / Pending / Payment status next to the total -->
+    <record id="view_order_tree_payment_status" model="ir.ui.view">
+        <field name="name">sale.order.list.payment.status</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <field name="amount_total" position="after">
+                <field name="inv_paid_amount" sum="Total Paid" widget="monetary"
+                       optional="show" decoration-success="inv_payment_status == 'paid'"/>
+                <field name="inv_pending_amount" sum="Total Pending" widget="monetary"
+                       optional="show" decoration-danger="inv_pending_amount &gt; 0"/>
+                <field name="inv_payment_status" widget="badge" optional="show"
+                       decoration-danger="inv_payment_status == 'unpaid'"
+                       decoration-warning="inv_payment_status == 'partial'"
+                       decoration-success="inv_payment_status == 'paid'"/>
+                <field name="inv_paid_percent" widget="progressbar" optional="hide"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Order form: Paid / Pending under the totals, salesperson lock -->
+    <record id="view_order_form_payment_status" model="ir.ui.view">
+        <field name="name">sale.order.form.payment.status</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='sale_total']" position="inside">
+                <field name="inv_paid_amount" widget="monetary" invisible="state != 'sale'"/>
+                <field name="inv_pending_amount" widget="monetary"
+                       class="oe_subtotal_footer_separator" invisible="state != 'sale'"/>
+                <field name="inv_payment_status" widget="badge" invisible="state != 'sale'"
+                       decoration-danger="inv_payment_status == 'unpaid'"
+                       decoration-warning="inv_payment_status == 'partial'"
+                       decoration-success="inv_payment_status == 'paid'"/>
+            </xpath>
+            <xpath expr="//group[@name='sales_person']/field[@name='user_id']" position="attributes">
+                <attribute name="readonly">salesperson_locked</attribute>
+            </xpath>
+            <xpath expr="//group[@name='sales_person']/field[@name='user_id']" position="after">
+                <field name="salesperson_locked" invisible="1"/>
+                <field name="warehouse_locked" invisible="1"/>
+                <field name="allowed_warehouse_ids" invisible="1"/>
+            </xpath>
+            <!-- Warehouse: only the assigned ones; fixed when there is a single one -->
+            <xpath expr="//field[@name='warehouse_id'][@force_save]" position="attributes">
+                <attribute name="domain">[('id', 'in', allowed_warehouse_ids)]</attribute>
+                <attribute name="readonly">state == 'sale' or warehouse_locked</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Orders search: payment filters and grouping -->
+    <record id="sale_order_view_search_payment_status" model="ir.ui.view">
+        <field name="name">sale.order.search.payment.status</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.sale_order_view_search_inherit_sale"/>
+        <field name="arch" type="xml">
+            <filter name="upselling" position="after">
+                <separator/>
+                <filter string="Payment Pending" name="payment_pending"
+                        domain="[('inv_payment_status', 'in', ('unpaid', 'partial'))]"/>
+                <filter string="Not Paid" name="payment_unpaid"
+                        domain="[('inv_payment_status', '=', 'unpaid')]"/>
+                <filter string="Partially Paid" name="payment_partial"
+                        domain="[('inv_payment_status', '=', 'partial')]"/>
+                <filter string="Fully Paid" name="payment_paid"
+                        domain="[('inv_payment_status', '=', 'paid')]"/>
+            </filter>
+            <filter name="customer" position="after">
+                <filter string="Payment Status" name="group_payment_status"
+                        context="{'group_by': 'inv_payment_status'}"/>
+            </filter>
+        </field>
+    </record>
+</odoo>
