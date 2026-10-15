@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_quick_flow" model="ir.ui.view">
+        <field name="name">sale.order.form.quick.flow</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Re-point the standard "Confirm" buttons to the full flow.
+                 Odoo 18 has two Confirm buttons in the header (sent / draft state). -->
+         <xpath expr="//header/button[@name='action_confirm']" position="attributes">
+       <attribute name="name">action_confirm_and_process</attribute>
+   </xpath>
+   <xpath expr="//header/button[@name='action_confirm']" position="attributes">
+       <attribute name="name">action_confirm_and_process</attribute>
+   </xpath>
+
+            <!-- Re-open the payment wizard later (e.g. after pressing Cancel on it) -->
+            <xpath expr="//header" position="inside">
+                <button name="action_open_quick_payment" type="object" string="Register Payment"
+                        class="btn-primary"
+                        invisible="state != 'sale' or not has_payable_invoice"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="has_payable_invoice" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
