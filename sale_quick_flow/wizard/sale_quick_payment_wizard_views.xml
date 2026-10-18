@@ -10,7 +10,6 @@
                 <group>
                     <group>
                         <field name="sale_order_id"/>
-                        <field name="move_id"/>
                         <field name="partner_id"/>
                     </group>
                     <group>
@@ -20,15 +19,19 @@
                 </group>
                 <group>
                     <group>
-                        <field name="payment_type" widget="radio" options="{'horizontal': true}"/>
+                        <field name="payment_type" widget="radio"/>
                         <field name="amount" readonly="payment_type == 'full'"/>
-                        <field name="journal_id" options="{'no_create': True, 'no_open': True}"/>
+                        <field name="journal_id" options="{'no_create': True, 'no_open': True}"
+                               required="amount > 0" invisible="amount == 0"/>
                     </group>
                     <group>
-                        <field name="payment_date"/>
-                        <field name="memo"/>
+                        <field name="payment_date" invisible="amount == 0"/>
+                        <field name="memo" invisible="amount == 0"/>
                     </group>
                 </group>
+                <div class="text-muted" invisible="amount != 0">
+                    Amount 0: the order stays confirmed and delivered, and no invoice is created.
+                </div>
                 <footer>
                     <button name="action_register_payment" string="Register Payment"
                             type="object" class="btn-primary" data-hotkey="q"/>

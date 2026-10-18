@@ -6,22 +6,24 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <!-- Re-point the standard "Confirm" buttons to the full flow.
-                 Odoo 18 has two Confirm buttons in the header (sent / draft state). -->
-         <xpath expr="//header/button[@name='action_confirm']" position="attributes">
-       <attribute name="name">action_confirm_and_process</attribute>
-   </xpath>
-   <xpath expr="//header/button[@name='action_confirm']" position="attributes">
-       <attribute name="name">action_confirm_and_process</attribute>
-   </xpath>
+                 Odoo 18 has two Confirm buttons in the header (sent / draft state).
+                 Specs apply sequentially: each xpath renames the first remaining match,
+                 so the same expression is used twice on purpose. -->
+            <xpath expr="//header/button[@name='action_confirm']" position="attributes">
+                <attribute name="name">action_confirm_and_process</attribute>
+            </xpath>
+            <xpath expr="//header/button[@name='action_confirm']" position="attributes">
+                <attribute name="name">action_confirm_and_process</attribute>
+            </xpath>
 
             <!-- Re-open the payment wizard later (e.g. after pressing Cancel on it) -->
             <xpath expr="//header" position="inside">
-                <button name="action_open_quick_payment" type="object" string="Register Payment"
+                <button name="action_open_quick_payment" type="object" string="Invoice &amp; Register Payment"
                         class="btn-primary"
-                        invisible="state != 'sale' or not has_payable_invoice"/>
+                        invisible="state != 'sale' or not has_pending_payment"/>
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="has_payable_invoice" invisible="1"/>
+                <field name="has_pending_payment" invisible="1"/>
             </xpath>
         </field>
     </record>
