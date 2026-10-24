@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_inovqi_business_roles" model="ir.ui.view">
+        <field name="name">res.partner.form.inovqi.business.roles</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Business Roles" name="inovqi_business_roles">
+                    <field name="inovqi_can_edit_roles" invisible="1"/>
+                    <group name="inovqi_business_roles_group">
+                        <group string="Business Roles">
+                            <field name="is_vendor" readonly="not inovqi_can_edit_roles"/>
+                            <field name="is_customer" readonly="not inovqi_can_edit_roles"/>
+                            <field name="is_employee_contact" readonly="not inovqi_can_edit_roles"/>
+                        </group>
+                        <group>
+                            <div class="text-muted" colspan="2">
+                                Vendors can be selected on Purchase Orders, customers on Sales Orders.
+                                The roles are independent: a contact can be both, or neither.
+                                Only members of the "Contact Role Manager" group can change them.
+                            </div>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_res_partner_filter_inovqi_roles" model="ir.ui.view">
+        <field name="name">res.partner.search.inovqi.roles</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter string="Vendors" name="inovqi_filter_vendor" domain="[('is_vendor', '=', True)]"/>
+                <filter string="Customers" name="inovqi_filter_customer" domain="[('is_customer', '=', True)]"/>
+                <filter string="Employees" name="inovqi_filter_employee" domain="[('is_employee_contact', '=', True)]"/>
+                <filter string="No Business Role" name="inovqi_filter_no_role"
+                        domain="[('is_vendor', '=', False), ('is_customer', '=', False), ('is_employee_contact', '=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

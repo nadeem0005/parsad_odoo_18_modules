@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="purchase_order_form_inovqi_control" model="ir.ui.view">
+        <field name="name">purchase.order.form.inovqi.control</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Vendors must be classified beforehand: no on-the-fly contact creation here.
+                 (The vendor domain itself is defined on the model field.) -->
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="options">{"no_create": True, "no_quick_create": True}</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

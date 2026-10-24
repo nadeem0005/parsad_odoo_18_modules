@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_users_form_inoviq_branch" model="ir.ui.view">
+        <field name="name">res.users.form.inoviq.branch</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Branch Access" name="inoviq_branch_access">
+                    <group>
+                        <group string="Warehouse restriction">
+                            <field name="warehouse_ids" widget="many2many_tags"
+                                   options="{'no_create': True}"/>
+                        </group>
+                        <group>
+                            <div class="text-muted">
+                                1. Set the allowed warehouse(s) here.<br/>
+                                2. In the Access Rights tab, under "Inoviq Branch", choose
+                                   "Branch User (Own Warehouse Only)".<br/>
+                                3. Leave Purchase, Accounting and Administration empty.
+                            </div>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="module_category_inoviq_branch" model="ir.module.category">
+        <field name="name">Inoviq Branch</field>
+        <field name="sequence">90</field>
+    </record>
+
+    <record id="group_branch_user" model="res.groups">
+        <field name="name">Branch User (Own Warehouse Only)</field>
+        <field name="category_id" ref="module_category_inoviq_branch"/>
+        <field name="implied_ids" eval="[(4, ref('stock.group_stock_user')), (4, ref('sales_team.group_sale_salesman_all_leads'))]"/>
+        <field name="comment">Limits the user to the warehouses set on his user form. Do not combine with Inventory/Sales Administrator groups.</field>
+    </record>
+
+    <!-- Global rules: they do nothing for normal users and restrict Branch Users. -->
+    <record id="rule_branch_quant" model="ir.rule">
+        <field name="name">Branch User: Own warehouse stock</field>
+        <field name="model_id" ref="stock.model_stock_quant"/>
+        <field name="domain_force">[(1, '=', 1)] if not user.has_group('inoviq_branch_access.group_branch_user') else [('location_id.warehouse_id', 'in', user.warehouse_ids.ids)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="rule_branch_picking_type" model="ir.rule">
+        <field name="name">Branch User: Own warehouse operation types</field>
+        <field name="model_id" ref="stock.model_stock_picking_type"/>
+        <field name="domain_force">[(1, '=', 1)] if not user.has_group('inoviq_branch_access.group_branch_user') else [('warehouse_id', 'in', user.warehouse_ids.ids)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="rule_branch_orderpoint" model="ir.rule">
+        <field name="name">Branch User: Own warehouse reordering rules</field>
+        <field name="model_id" ref="stock.model_stock_warehouse_orderpoint"/>
+        <field name="domain_force">[(1, '=', 1)] if not user.has_group('inoviq_branch_access.group_branch_user') else [('warehouse_id', 'in', user.warehouse_ids.ids)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="rule_branch_scrap" model="ir.rule">
+        <field name="name">Branch User: Own warehouse scrap</field>
+        <field name="model_id" ref="stock.model_stock_scrap"/>
+        <field name="domain_force">[(1, '=', 1)] if not user.has_group('inoviq_branch_access.group_branch_user') else [('location_id.warehouse_id', 'in', user.warehouse_ids.ids)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="rule_branch_report_stock_qty" model="ir.rule">
+        <field name="name">Branch User: Own warehouse stock forecast report</field>
+        <field name="model_id" ref="stock.model_report_stock_quantity"/>
+        <field name="domain_force">[(1, '=', 1)] if not user.has_group('inoviq_branch_access.group_branch_user') else [('warehouse_id', 'in', user.warehouse_ids.ids)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="rule_branch_picking_read" model="ir.rule">
+        <field name="name">Branch User: Transfers: own and incoming (read)</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="domain_force">[(1, '=', 1)] if not user.has_group('inoviq_branch_access.group_branch_user') else ['|', ('picking_type_id.warehouse_id', 'in', user.warehouse_ids.ids), ('location_dest_id.warehouse_id', 'in', user.warehouse_ids.ids)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_branch_picking_write" model="ir.rule">
+        <field name="name">Branch User: Transfers: only own (create/edit)</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="domain_force">[(1, '=', 1)] if not user.has_group('inoviq_branch_access.group_branch_user') else [('picking_type_id.warehouse_id', 'in', user.warehouse_ids.ids)]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="rule_branch_move_read" model="ir.rule">
+        <field name="name">Branch User: Stock moves: own warehouse (read)</field>
+        <field name="model_id" ref="stock.model_stock_move"/>
+        <field name="domain_force">[(1, '=', 1)] if not user.has_group('inoviq_branch_access.group_branch_user') else ['|', ('location_id.warehouse_id', 'in', user.warehouse_ids.ids), ('location_dest_id.warehouse_id', 'in', user.warehouse_ids.ids)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_branch_move_write" model="ir.rule">
+        <field name="name">Branch User: Stock moves: own warehouse (create/edit)</field>
+        <field name="model_id" ref="stock.model_stock_move"/>
+        <field name="domain_force">[(1, '=', 1)] if not user.has_group('inoviq_branch_access.group_branch_user') else ['|', ('picking_type_id.warehouse_id', 'in', user.warehouse_ids.ids), '&amp;', ('picking_type_id', '=', False), '|', ('location_id.warehouse_id', 'in', user.warehouse_ids.ids), ('location_dest_id.warehouse_id', 'in', user.warehouse_ids.ids)]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="rule_branch_move_line_read" model="ir.rule">
+        <field name="name">Branch User: Moves history: own warehouse (read)</field>
+        <field name="model_id" ref="stock.model_stock_move_line"/>
+        <field name="domain_force">[(1, '=', 1)] if not user.has_group('inoviq_branch_access.group_branch_user') else ['|', ('location_id.warehouse_id', 'in', user.warehouse_ids.ids), ('location_dest_id.warehouse_id', 'in', user.warehouse_ids.ids)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_branch_move_line_write" model="ir.rule">
+        <field name="name">Branch User: Moves history: own warehouse (create/edit)</field>
+        <field name="model_id" ref="stock.model_stock_move_line"/>
+        <field name="domain_force">[(1, '=', 1)] if not user.has_group('inoviq_branch_access.group_branch_user') else ['|', ('picking_id.picking_type_id.warehouse_id', 'in', user.warehouse_ids.ids), '&amp;', ('picking_id', '=', False), '|', ('location_id.warehouse_id', 'in', user.warehouse_ids.ids), ('location_dest_id.warehouse_id', 'in', user.warehouse_ids.ids)]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="rule_branch_sale_order" model="ir.rule">
+        <field name="name">Branch User: Own warehouse sales orders</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="domain_force">[(1, '=', 1)] if not user.has_group('inoviq_branch_access.group_branch_user') else [('warehouse_id', 'in', user.warehouse_ids.ids)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="rule_branch_sale_order_line" model="ir.rule">
+        <field name="name">Branch User: Own warehouse sales order lines</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="domain_force">[(1, '=', 1)] if not user.has_group('inoviq_branch_access.group_branch_user') else [('order_id.warehouse_id', 'in', user.warehouse_ids.ids)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="rule_branch_sale_report" model="ir.rule">
+        <field name="name">Branch User: Own warehouse sales analysis</field>
+        <field name="model_id" ref="sale.model_sale_report"/>
+        <field name="domain_force">[(1, '=', 1)] if not user.has_group('inoviq_branch_access.group_branch_user') else [('warehouse_id', 'in', user.warehouse_ids.ids)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="rule_branch_warehouse" model="ir.rule">
+        <field name="name">Branch User: only own warehouses are visible</field>
+        <field name="model_id" ref="stock.model_stock_warehouse"/>
+        <field name="domain_force">[(1, '=', 1)] if not user.has_group('inoviq_branch_access.group_branch_user') else [('id', 'in', user.sudo().warehouse_ids.ids)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+</odoo>
